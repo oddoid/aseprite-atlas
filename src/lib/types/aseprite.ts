@@ -72,7 +72,7 @@ export namespace Aseprite {
     /** The `Frame`'s bounds within the file packed, not including padding. */
     readonly spriteSourceSize: Readonly<Rect>
     /** The width and height components of spriteSourceSize. */
-    readonly sourceSize: Readonly<WH> // now i need an aseprite w/h
+    readonly sourceSize: Readonly<WH>
     readonly duration: Duration
   }
 
