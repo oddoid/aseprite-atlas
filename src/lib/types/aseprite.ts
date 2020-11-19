@@ -1,7 +1,5 @@
-import type {Int} from './int.js'
-import type {Millis} from './millis.js'
-import type {Rect} from './rect.js'
-import type {WH} from './wh.js'
+import {Int} from './int.js'
+import {Millis} from './millis.js'
 
 /**
  * This typing assumes the options specified in aseprite-atlas-pack and
@@ -9,8 +7,9 @@ import type {WH} from './wh.js'
  * undocumented but the related [binary format] is. Types marked
  * "**by convention**" are supplemental to and unenforced by the JSON format.
  * Any data of these types should be validated as soon as possible. All numbers
- * are integers. All indices are zero-based. All geometry are described from
- * the top left to the bottom right in pixel units.
+ * are integers but typing is loosened to `Int | number` so that a cast isn't
+ * needed when parsing the Aseprite JSON. All indices are zero-based. All
+ * geometry are described from the top left to the bottom right in pixel units.
  *
  * [binary format]: https://github.com/aseprite/aseprite/blob/master/docs/ase-file-specs.md
  */
@@ -73,7 +72,7 @@ export namespace Aseprite {
     /** The `Frame`'s bounds within the file packed, not including padding. */
     readonly spriteSourceSize: Readonly<Rect>
     /** The width and height components of spriteSourceSize. */
-    readonly sourceSize: Readonly<WH>
+    readonly sourceSize: Readonly<WH> // now i need an aseprite w/h
     readonly duration: Duration
   }
 
@@ -85,12 +84,12 @@ export namespace Aseprite {
     /** **By convention**, the associated `Frame`'s `Tag`. */
     readonly name: Tag
     /** The inclusive starting Frame index. */
-    readonly from: Int
+    readonly from: Int | number
     /**
      * The inclusive ending `Frame` index, possibly identical to the starting
      * frame index.
      */
-    readonly to: Int
+    readonly to: Int | number
     /**
      * Loosened typing to a string so a cast isn't needed when parsing the
      * Aseprite JSON.
@@ -145,8 +144,20 @@ export namespace Aseprite {
      * `Key`'s `Frame` index may be calculated from
      * `FrameTag.index + Key.frame`.
      */
-    readonly frame: Int
+    readonly frame: Int | number
     /** The `Slice` dimensions. */
     readonly bounds: Readonly<Rect>
+  }
+
+  export interface Rect extends XY, WH {}
+
+  export interface WH {
+    readonly w: Int | number
+    readonly h: Int | number
+  }
+
+  export interface XY {
+    readonly x: Int | number
+    readonly y: Int | number
   }
 }

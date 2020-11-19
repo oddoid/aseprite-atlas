@@ -36,7 +36,7 @@ aseprite-atlas ┌>°┐
       window,
       canvas,
       context,
-      animator: {period: 0, exposure: 0},
+      animator: <Animator>{period: 0, exposure: 0},
       atlas,
       atlasImage
     }

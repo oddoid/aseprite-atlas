@@ -8,6 +8,7 @@ import type {XY} from '../types/xy.js'
 
 export namespace Parser {
   export function parse(file: Aseprite.File): Atlas {
+    assertWH(file.meta.size)
     return Object.freeze({
       version: file.meta.version,
       filename: file.meta.image,
@@ -40,7 +41,10 @@ export namespace Parser {
     slices: readonly Aseprite.Slice[]
   ): Atlas.Animation {
     const frames = tagFrames(frameTag, frameMap)
-    const cels = frames.map((frame, i) => parseCel(frameTag, frame, i, slices))
+    const cels = frames.map((frame, i) => {
+      Int.assert(i)
+      return parseCel(frameTag, frame, i, slices)
+    })
     let duration = cels.reduce((time, {duration}) => time + duration, 0)
     const pingPong = frameTag.direction === Aseprite.Direction.PingPong
     if (pingPong && cels.length > 2)
@@ -59,6 +63,8 @@ export namespace Parser {
       )
 
     const {w, h} = frames[0]!.sourceSize
+    Int.assert(w)
+    Int.assert(h)
     return {
       size: Object.freeze({w, h}),
       cels: Object.freeze(cels),
@@ -99,7 +105,7 @@ export namespace Parser {
   export function parseCel(
     frameTag: Aseprite.FrameTag,
     frame: Aseprite.Frame,
-    frameNumber: number,
+    frameNumber: Int,
     slices: readonly Aseprite.Slice[]
   ): Atlas.Cel {
     return Object.freeze({
@@ -112,10 +118,11 @@ export namespace Parser {
   /** @internal */
   export function parsePosition(frame: Aseprite.Frame): Readonly<XY> {
     const padding = parsePadding(frame)
-    return Object.freeze({
-      x: frame.frame.x + padding.w / 2,
-      y: frame.frame.y + padding.h / 2
-    })
+    const x = frame.frame.x + padding.w / 2
+    const y = frame.frame.y + padding.h / 2
+    Int.assert(x)
+    Int.assert(y)
+    return Object.freeze({x, y})
   }
 
   /** @internal */
@@ -123,7 +130,11 @@ export namespace Parser {
     frame,
     sourceSize
   }: Aseprite.Frame): Readonly<WH> {
-    return Object.freeze({w: frame.w - sourceSize.w, h: frame.h - sourceSize.h})
+    const w = frame.w - sourceSize.w
+    const h = frame.h - sourceSize.h
+    Int.assert(w)
+    Int.assert(h)
+    return Object.freeze({w, h})
   }
 
   /** @internal */
@@ -146,8 +157,29 @@ export namespace Parser {
       if (slice.name !== name) continue
       // Get the greatest relevant Key.
       const key = slice.keys.filter(key => key.frame <= index).slice(-1)[0]
-      if (key) bounds.push(key.bounds)
+      if (key) {
+        assertRect(key.bounds)
+        bounds.push(key.bounds)
+      }
     }
     return Object.freeze(bounds)
+  }
+
+  /** @internal */
+  export function assertRect(rect: Aseprite.Rect): asserts rect is Rect {
+    assertXY(rect)
+    assertWH(rect)
+  }
+
+  /** @internal */
+  export function assertWH(wh: Aseprite.WH): asserts wh is WH {
+    Int.assert(wh.w)
+    Int.assert(wh.h)
+  }
+
+  /** @internal */
+  export function assertXY(xy: Aseprite.XY): asserts xy is XY {
+    Int.assert(xy.x)
+    Int.assert(xy.y)
   }
 }

@@ -63,7 +63,9 @@ export namespace Animator {
 
   /** @return The `Animation` `Cel` index. */
   export function index(period: Int, cels: readonly Atlas.Cel[]): Int {
-    return Math.abs(period % cels.length)
+    const index = Math.abs(period % cels.length)
+    Int.assert(index)
+    return index
   }
 }
 
@@ -73,16 +75,22 @@ const nextPeriod: Readonly<
 > = Object.freeze({
   /** @arg period An integer in the domain [0, +∞). */
   [Aseprite.Direction.Forward](period) {
-    return (period % Number.MAX_SAFE_INTEGER) + 1
+    const next = (period % Number.MAX_SAFE_INTEGER) + 1
+    Int.assert(next)
+    return next
   },
 
   /** @arg period An integer in the domain (-∞, len - 1]. */
   [Aseprite.Direction.Reverse](period, len) {
-    return (period % Number.MIN_SAFE_INTEGER) - 1 + len
+    const next = (period % Number.MIN_SAFE_INTEGER) - 1 + len
+    Int.assert(next)
+    return next
   },
 
   /** @arg period An integer in the domain [2 - len, len - 1]. */
   [Aseprite.Direction.PingPong](period, len) {
-    return NumberUtil.wrap(period - 1, 2 - len, len)
+    const next = NumberUtil.wrap(period - 1, 2 - len, len)
+    Int.assert(next)
+    return next
   }
 })
