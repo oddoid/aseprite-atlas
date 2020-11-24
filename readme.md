@@ -184,13 +184,13 @@ minimal example follows. Subsequent sections detail each step in the example.
 All together, parse the packed sprite sheet and play the frog's idle animation:
 
 ```js
-import {Animator, Parser} from 'aseprite-atlas'
+import {Animator, Int, Parser} from 'aseprite-atlas'
 import * as asepriteJSON from './atlas.json'
 
 const atlas = Parser.parse(asepriteJSON)
 
 const animation = atlas.animations['frog-idle']
-let animator = {period: 0, exposure: 0}
+let animator = {period: Int(0), exposure: 0}
 
 animator = Animator.animate(
   animator.period,
@@ -243,12 +243,12 @@ import {Animator} from 'aseprite-atlas'
 // oscillation period (which is used to derive the active index for the cels
 // array) and its exposure timer (which is used to determine when the period
 // should be advanced). Animators are just plain data.
-let animator = {period: 0, exposure: 0}
+let animator = {period: Int(0), exposure: 0}
 
 // Animate by 1/60th of a second (~16.667 milliseconds). Depending on the cel
 // duration specified in Aseprite, this may or may not advance the active cel.
 // For a multi-cel forward animation where the first cel has a 10 millisecond
-// duration, animator's state would be {period: 1, exposure: 6.667}.
+// duration, animator's state would be {period: Int(1), exposure: 6.667}.
 animator = Animator.animate(
   animator.period,
   animator.exposure + 16.667,

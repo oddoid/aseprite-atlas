@@ -1,23 +1,23 @@
-import {Integer} from './Integer'
+import {Int} from './int'
 
-describe('Integer()', () => {
-  test('integer', () => expect(Integer(1)).toStrictEqual(1))
+describe('Int()', () => {
+  test('integer', () => expect(Int(1)).toStrictEqual(1))
 
-  test('fraction', () => expect(Integer(7 / 2)).toStrictEqual(3))
+  test('fraction', () => expect(Int(7 / 2)).toStrictEqual(3))
 })
 
 describe('assert()', () => {
-  test('integer', () => Integer.assert(1))
+  test('integer', () => Int.assert(1))
 
-  test('Integer', () => Integer.assert(Integer(2)))
+  test('Int', () => Int.assert(Int(2)))
 
-  test('fraction', () => expect(() => Integer.assert(7 / 2)).toThrow())
+  test('fraction', () => expect(() => Int.assert(7 / 2)).toThrow())
 })
 
 describe('is()', () => {
-  test('integer', () => expect(Integer.is(1)).toStrictEqual(true))
+  test('integer', () => expect(Int.is(1)).toStrictEqual(true))
 
-  test('Integer', () => expect(Integer.is(Integer(2))).toStrictEqual(true))
+  test('Int', () => expect(Int.is(Int(2))).toStrictEqual(true))
 
-  test('fraction', () => expect(Integer.is(7 / 2)).toStrictEqual(false))
+  test('fraction', () => expect(Int.is(7 / 2)).toStrictEqual(false))
 })

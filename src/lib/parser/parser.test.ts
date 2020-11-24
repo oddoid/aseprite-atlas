@@ -371,7 +371,7 @@ describe('parseCel()', () => {
         keys: [{frame: 0, bounds: {x: 4, y: 4, w: 8, h: 12}}]
       }
     ]
-    expect(Parser.parseCel(frameTag, frame, <Int>0, slices)).toStrictEqual({
+    expect(Parser.parseCel(frameTag, frame, Int(0), slices)).toStrictEqual({
       position: {x: 131, y: 19},
       duration: Number.POSITIVE_INFINITY,
       slices: [{x: 4, y: 4, w: 8, h: 12}]
@@ -467,7 +467,7 @@ describe('parseSlices()', () => {
         keys: [{frame: 0, bounds: {x: 0, y: 1, w: 2, h: 3}}]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>0, slices)).toStrictEqual([
+    expect(Parser.parseSlices(frameTag, Int(0), slices)).toStrictEqual([
       {x: 0, y: 1, w: 2, h: 3}
     ])
   })
@@ -481,7 +481,7 @@ describe('parseSlices()', () => {
         keys: [{frame: 0, bounds: {x: 0, y: 1, w: 2, h: 3}}]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>0, slices)).toStrictEqual([])
+    expect(Parser.parseSlices(frameTag, Int(0), slices)).toStrictEqual([])
   })
 
   test('Filters out unrelated Frame number Keys.', () => {
@@ -497,7 +497,7 @@ describe('parseSlices()', () => {
         ]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>1, slices)).toStrictEqual([
+    expect(Parser.parseSlices(frameTag, Int(1), slices)).toStrictEqual([
       {x: 4, y: 5, w: 6, h: 7}
     ])
   })
@@ -514,14 +514,14 @@ describe('parseSlices()', () => {
         ]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>0, slices)).toStrictEqual([
+    expect(Parser.parseSlices(frameTag, Int(0), slices)).toStrictEqual([
       {x: 0, y: 1, w: 2, h: 3}
     ])
   })
 
   test('Converts no Slices.', () => {
     const frameTag = {name: 'stem ', from: 0, to: 0, direction: 'forward'}
-    expect(Parser.parseSlices(frameTag, <Int>0, [])).toStrictEqual([])
+    expect(Parser.parseSlices(frameTag, Int(0), [])).toStrictEqual([])
   })
 
   test('Converts multiple Slices.', () => {
@@ -552,7 +552,7 @@ describe('parseSlices()', () => {
         keys: [{frame: 0, bounds: {x: 8, y: 9, w: 10, h: 11}}]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>1, slices)).toStrictEqual([
+    expect(Parser.parseSlices(frameTag, Int(1), slices)).toStrictEqual([
       {x: 4, y: 5, w: 6, h: 7},
       {x: 0, y: 1, w: 2, h: 3},
       {x: 8, y: 9, w: 10, h: 11}
@@ -568,6 +568,6 @@ describe('parseSlices()', () => {
         keys: [{frame: 1, bounds: {x: 0, y: 1, w: 2, h: 3}}]
       }
     ]
-    expect(Parser.parseSlices(frameTag, <Int>0, slices)).toStrictEqual([])
+    expect(Parser.parseSlices(frameTag, Int(0), slices)).toStrictEqual([])
   })
 })
