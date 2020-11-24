@@ -4,6 +4,10 @@ import type {Int} from '../types/int.js'
 import type {Millis} from '../types/millis.js'
 import {NumberUtil} from '../utils/number-util.js'
 
+export function Animator(period: Int = Int(0), exposure = 0): Animator {
+  return {period, exposure}
+}
+
 /** Record and update playback state for an `Animation`. */
 export interface Animator {
   /**

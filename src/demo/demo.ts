@@ -1,4 +1,4 @@
-import {Aseprite, Animator, Atlas, Int, Parser} from '../../dist/lib/index.js'
+import {Aseprite, Animator, Atlas, Parser} from '../../dist/lib/index.js'
 import {AtlasID} from './atlas-id.js'
 
 interface Game {
@@ -36,7 +36,7 @@ aseprite-atlas ┌>°┐
       window,
       canvas,
       context,
-      animator: {period: Int(0), exposure: 0},
+      animator: Animator(),
       atlas,
       atlasImage
     }

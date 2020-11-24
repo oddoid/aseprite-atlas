@@ -5,3 +5,7 @@ export interface XY {
   x: Int
   y: Int
 }
+
+export function XY(x: number, y: number): XY {
+  return {x: Int(x), y: Int(y)}
+}
