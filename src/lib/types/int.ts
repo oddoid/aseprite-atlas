@@ -3,7 +3,7 @@ export type Int = number & {[brand]: void}
 declare const brand: unique symbol
 
 export function Int(value: number): Int {
-  return <Int>~~value
+  return <Int>Math.trunc(value)
 }
 
 export namespace Int {
