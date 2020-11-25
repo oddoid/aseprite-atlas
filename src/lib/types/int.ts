@@ -12,6 +12,6 @@ export namespace Int {
   }
 
   export function is(value: number | Int): value is Int {
-    return ~~value === value
+    return Int(value) === value
   }
 }
