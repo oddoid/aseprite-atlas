@@ -1,43 +1,60 @@
 import {Int} from './int'
 
 describe('Int()', () => {
-  test('integer', () => expect(Int(1)).toStrictEqual(1))
+  test.each([
+    ['min safe integer', Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
+    ['negative integer', -1, -1],
+    ['zero', 0, 0],
+    ['positive integer', 1, 1],
+    ['max safe integer', Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
 
-  test('fraction', () => expect(Int(7 / 2)).toStrictEqual(3))
+    ['negative infinity', Number.NEGATIVE_INFINITY, Number.MIN_SAFE_INTEGER],
+    ['min fraction', -Number.MAX_VALUE, Number.MIN_SAFE_INTEGER],
+    ['negative fraction', -1.5, -1],
+    ['positive fraction', 1.5, 1],
+    ['max fraction', Number.MAX_VALUE, Number.MAX_SAFE_INTEGER],
+    ['positive infinity', Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER]
+  ])('%s', (_, value, expected) => expect(Int(value)).toStrictEqual(expected))
 
-  test('min', () =>
-    expect(Int(Number.MIN_SAFE_INTEGER)).toStrictEqual(Number.MIN_SAFE_INTEGER))
-
-  test('zero', () => expect(Int(0)).toStrictEqual(0))
-
-  test('max', () =>
-    expect(Int(Number.MAX_SAFE_INTEGER)).toStrictEqual(Number.MAX_SAFE_INTEGER))
+  test('not a number', () => expect(() => Int(NaN)).toThrow())
 })
 
 describe('assert()', () => {
-  test('integer', () => Int.assert(1))
+  test.each([
+    ['min safe integer', Number.MIN_SAFE_INTEGER],
+    ['negative integer', -1],
+    ['zero', 0],
+    ['positive integer', 1],
+    ['max safe integer', Number.MAX_SAFE_INTEGER]
+  ])('%s', (_, value) => Int.assert(value))
 
-  test('Int', () => Int.assert(Int(2)))
-
-  test('fraction', () => expect(() => Int.assert(7 / 2)).toThrow())
-
-  test('min', () => Int.assert(Number.MIN_SAFE_INTEGER))
-
-  test('zero', () => Int.assert(0))
-
-  test('max', () => Int.assert(Number.MAX_SAFE_INTEGER))
+  test.each([
+    ['negative infinity', Number.NEGATIVE_INFINITY],
+    ['min fraction', -Number.MAX_VALUE],
+    ['negative fraction', -1.5],
+    ['positive fraction', 1.5],
+    ['max fraction', Number.MAX_VALUE],
+    ['positive infinity', Number.POSITIVE_INFINITY],
+    ['not a number', NaN]
+  ])('%s', (_, value) => expect(() => Int.assert(value)).toThrow())
 })
 
 describe('is()', () => {
-  test('integer', () => expect(Int.is(1)).toStrictEqual(true))
+  test.each([
+    ['min safe integer', Number.MIN_SAFE_INTEGER],
+    ['negative integer', -1],
+    ['zero', 0],
+    ['positive integer', 1],
+    ['max safe integer', Number.MAX_SAFE_INTEGER]
+  ])('%s', (_, value) => expect(Int.is(value)).toStrictEqual(true))
 
-  test('Int', () => expect(Int.is(Int(2))).toStrictEqual(true))
-
-  test('fraction', () => expect(Int.is(7 / 2)).toStrictEqual(false))
-
-  test('min', () => expect(Int.is(Number.MIN_SAFE_INTEGER)).toStrictEqual(true))
-
-  test('zero', () => expect(Int.is(0)).toStrictEqual(true))
-
-  test('max', () => expect(Int.is(Number.MAX_SAFE_INTEGER)).toStrictEqual(true))
+  test.each([
+    ['negative infinity', Number.NEGATIVE_INFINITY],
+    ['min fraction', -Number.MAX_VALUE],
+    ['negative fraction', -1.5],
+    ['positive fraction', 1.5],
+    ['max fraction', Number.MAX_VALUE],
+    ['positive infinity', Number.POSITIVE_INFINITY],
+    ['not a number', NaN]
+  ])('%s', (_, value) => expect(Int.is(value)).toStrictEqual(false))
 })
