@@ -1,7 +1,8 @@
 import {Aseprite} from '../types/aseprite.js'
-import type {Atlas} from '../types/atlas.js'
-import type {Int} from '../types/int.js'
-import type {Millis} from '../types/millis.js'
+import {Atlas} from '../types/atlas.js'
+import {Int} from '../types/int.js'
+import {Millis} from '../types/millis.js'
+import {requireType} from '../utils/assert.js'
 import {NumberUtil} from '../utils/number-util.js'
 
 export function Animator(period: Int = Int(0), exposure = 0): Animator {
@@ -55,11 +56,12 @@ export namespace Animator {
     // `animation.duration` may be infinite but the modulo of any number and
     // infinity is that number. Duration is positive.
     exposure = exposure % animation.duration
+    if (animation.cels.length < 2) return {period, exposure}
     for (;;) {
-      const {duration} = animation.cels[index(period, animation.cels)]!
-      if (exposure < duration) break
+      const cel = requireType(animation.cels[index(period, animation.cels)])
+      if (exposure < cel.duration) break
 
-      exposure -= duration
+      exposure -= cel.duration
       period = nextPeriod[animation.direction](period, animation.cels.length)
     }
     return {period, exposure}
@@ -67,9 +69,7 @@ export namespace Animator {
 
   /** @return The `Animation` `Cel` index. */
   export function index(period: Int, cels: readonly Atlas.Cel[]): Int {
-    const index = Math.abs(period % cels.length)
-    Int.assert(index)
-    return index
+    return Int.require(Math.abs(period % cels.length))
   }
 }
 
@@ -77,24 +77,23 @@ export namespace Animator {
 const nextPeriod: Readonly<
   Record<Aseprite.Direction, (period: Int, len: number) => Int>
 > = Object.freeze({
-  /** @arg period An integer in the domain [0, +∞). */
-  [Aseprite.Direction.Forward](period) {
-    const next = (period % Number.MAX_SAFE_INTEGER) + 1
-    Int.assert(next)
+  forward(period, len) {
+    const next = Int.require((period + 1) % len)
+    NumberUtil.assertDomain(next, 0, len, 'inclusive-exclusive')
     return next
   },
 
-  /** @arg period An integer in the domain (-∞, len - 1]. */
-  [Aseprite.Direction.Reverse](period, len) {
-    const next = (period % Number.MIN_SAFE_INTEGER) - 1 + len
-    Int.assert(next)
+  reverse(period, len) {
+    const next = Int.require(
+      (((period - 1) % Number.MIN_SAFE_INTEGER) + len) % len
+    )
+    NumberUtil.assertDomain(next, Number.MIN_SAFE_INTEGER, len, 'exclusive')
     return next
   },
 
-  /** @arg period An integer in the domain [2 - len, len - 1]. */
-  [Aseprite.Direction.PingPong](period, len) {
-    const next = NumberUtil.wrap(period - 1, 2 - len, len)
-    Int.assert(next)
+  pingpong(period, len) {
+    const next = Int.require(NumberUtil.wrap(period - 1, 2 - len, len))
+    NumberUtil.assertDomain(next, 2 - len, len - 1, 'inclusive')
     return next
   }
 })

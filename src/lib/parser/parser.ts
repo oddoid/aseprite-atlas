@@ -1,19 +1,19 @@
 import {Aseprite} from '../types/aseprite.js'
-import type {Atlas} from '../types/atlas.js'
-import type {Int} from '../types/int.js'
-import type {Millis} from '../types/millis.js'
-import type {Rect} from '../types/rect.js'
-import type {WH} from '../types/wh.js'
-import type {XY} from '../types/xy.js'
+import {assert} from '../utils/assert.js'
+import {Atlas} from '../types/atlas.js'
+import {Int} from '../types/int.js'
+import {Millis} from '../types/millis.js'
+import {Rect} from '../types/rect.js'
+import {WH} from '../types/wh.js'
+import {XY} from '../types/xy.js'
 
 export namespace Parser {
   export function parse(file: Aseprite.File): Atlas {
-    assertWH(file.meta.size)
     return Object.freeze({
       version: file.meta.version,
       filename: file.meta.image,
       format: file.meta.format,
-      size: file.meta.size,
+      size: parseWH(file.meta.size),
       animations: parseAnimationRecord(file)
     })
   }
@@ -27,8 +27,7 @@ export namespace Parser {
     const record: Record<Aseprite.Tag, Atlas.Animation> = {}
     for (const frameTag of frameTags) {
       // Every tag should be unique within the sheet.
-      if (frameTag.name in record)
-        throw new Error(`Duplicate tag "${frameTag.name}".`)
+      assert(record[frameTag.name] == null, `Duplicate tag "${frameTag.name}".`)
       record[frameTag.name] = parseAnimation(frameTag, frames, slices)
     }
     return Object.freeze(record)
@@ -41,26 +40,22 @@ export namespace Parser {
     slices: readonly Aseprite.Slice[]
   ): Atlas.Animation {
     const frames = tagFrames(frameTag, frameMap)
-    const cels = frames.map((frame, i) => {
-      Int.assert(i)
-      return parseCel(frameTag, frame, i, slices)
-    })
+    const cels = frames.map((frame, i) =>
+      parseCel(frameTag, frame, Int.require(i), slices)
+    )
     let duration = cels.reduce((time, {duration}) => time + duration, 0)
     const pingPong = frameTag.direction === Aseprite.Direction.PingPong
     if (pingPong && cels.length > 2)
       duration +=
         duration - (cels[0]!.duration + cels[cels.length - 1]!.duration)
 
-    if (!cels.length)
-      throw new Error(`"${frameTag.name}" animation missing cels.`)
-    if (
+    assert(cels.length > 0, `"${frameTag.name}" animation has no cels.`)
+    assert(
       cels
         .slice(0, -1)
-        .some(({duration}) => duration === Number.POSITIVE_INFINITY)
+        .every(({duration}) => duration !== Number.POSITIVE_INFINITY),
+      `Intermediate cel has infinite duration for "${frameTag.name}" animation.`
     )
-      throw new Error(
-        `Intermediate cel has infinite duration for "${frameTag.name}" animation.`
-      )
 
     const {w, h} = frames[0]!.sourceSize
     Int.assert(w)
@@ -80,7 +75,7 @@ export namespace Parser {
     const frames = []
     for (; from <= to; ++from) {
       const frame = frameMap[`${name} ${from}`]
-      if (!frame) throw new Error(`Missing Frame "${name} ${from}".`)
+      assert(frame != null, `Missing Frame "${name} ${from}".`)
       frames.push(frame)
     }
     return frames
@@ -90,8 +85,8 @@ export namespace Parser {
   export function parseDirection(
     direction: Aseprite.Direction | string
   ): Aseprite.Direction {
-    if (isDirection(direction)) return direction
-    throw new Error(`"${direction}" is not a Direction.`)
+    assert(isDirection(direction), `"${direction}" is not a Direction.`)
+    return direction
   }
 
   /** @internal */
@@ -118,10 +113,8 @@ export namespace Parser {
   /** @internal */
   export function parsePosition(frame: Aseprite.Frame): Readonly<XY> {
     const padding = parsePadding(frame)
-    const x = frame.frame.x + padding.w / 2
-    const y = frame.frame.y + padding.h / 2
-    Int.assert(x)
-    Int.assert(y)
+    const x = Int.require(frame.frame.x + padding.w / 2)
+    const y = Int.require(frame.frame.y + padding.h / 2)
     return Object.freeze({x, y})
   }
 
@@ -130,10 +123,8 @@ export namespace Parser {
     frame,
     sourceSize
   }: Aseprite.Frame): Readonly<WH> {
-    const w = frame.w - sourceSize.w
-    const h = frame.h - sourceSize.h
-    Int.assert(w)
-    Int.assert(h)
+    const w = Int.require(frame.w - sourceSize.w)
+    const h = Int.require(frame.h - sourceSize.h)
     return Object.freeze({w, h})
   }
 
@@ -141,7 +132,7 @@ export namespace Parser {
   export function parseDuration(
     duration: Aseprite.Duration
   ): Millis | typeof Number.POSITIVE_INFINITY {
-    if (duration <= 0) throw new Error('Expected positive cel duration.')
+    assert(duration > 0, 'Cel duration is not positive.')
     return duration === Aseprite.Infinite ? Number.POSITIVE_INFINITY : duration
   }
 
@@ -155,31 +146,43 @@ export namespace Parser {
     for (const slice of slices) {
       // Ignore Slices not for this Tag.
       if (slice.name !== name) continue
-      // Get the greatest relevant Key.
+      // Get the greatest relevant Key, if any.
       const key = slice.keys.filter(key => key.frame <= index).slice(-1)[0]
-      if (key) {
-        assertRect(key.bounds)
-        bounds.push(key.bounds)
-      }
+      if (key != null) bounds.push(parseRect(key.bounds))
     }
     return Object.freeze(bounds)
   }
 
   /** @internal */
-  export function assertRect(rect: Aseprite.Rect): asserts rect is Rect {
-    assertXY(rect)
-    assertWH(rect)
+  export function parseRect(rect: Aseprite.Rect): Rect {
+    assert(isRect(rect), `${rect} is not an Rect.`)
+    return rect
   }
 
   /** @internal */
-  export function assertWH(wh: Aseprite.WH): asserts wh is WH {
-    Int.assert(wh.w)
-    Int.assert(wh.h)
+  export function isRect(rect: Aseprite.Rect): rect is Rect {
+    return isXY(rect) && isWH(rect)
   }
 
   /** @internal */
-  export function assertXY(xy: Aseprite.XY): asserts xy is XY {
-    Int.assert(xy.x)
-    Int.assert(xy.y)
+  export function parseWH(wh: Aseprite.WH): WH {
+    assert(isWH(wh), `${wh} is not an WH.`)
+    return wh
+  }
+
+  /** @internal */
+  export function isWH(wh: Aseprite.WH): wh is WH {
+    return Int.is(wh.w) && Int.is(wh.h)
+  }
+
+  /** @internal */
+  export function parseXY(xy: Aseprite.XY): XY {
+    assert(isXY(xy), `${xy} is not an XY.`)
+    return xy
+  }
+
+  /** @internal */
+  export function isXY(xy: Aseprite.XY): xy is XY {
+    return Int.is(xy.x) && Int.is(xy.y)
   }
 }

@@ -55,13 +55,13 @@ describe('animate()', () => {
       duration: Number.POSITIVE_INFINITY,
       direction: 'forward'
     }
-    let animator = Animator.animate(Int(0), 0.5, animation)
+    const animator = Animator.animate(Int(0), 0.5, animation)
     expect(animator).toMatchObject({period: 0, exposure: 0.5})
-    animator = Animator.animate(
+    ;({exposure: animator.exposure, period: animator.period} = Animator.animate(
       animator.period,
       animator.exposure + 100,
       animation
-    )
+    ))
     expect(animator).toMatchObject({period: 1, exposure: 99.5})
   })
 
@@ -74,7 +74,7 @@ describe('animate()', () => {
       direction: 'forward'
     }
     const animator = Animator.animate(Int(0), 1.5, animation)
-    expect(animator).toMatchObject({period: 1, exposure: 0.5})
+    expect(animator).toMatchObject({period: 0, exposure: 1.5})
   })
 })
 
@@ -90,8 +90,8 @@ describe('index', () => {
         direction
       }
       const {period} = Animator.animate(Int(0), 1, animation)
-      const animator = Animator.index(period, animation.cels)
-      expect(animator).toStrictEqual(1)
+      const index = Animator.index(period, animation.cels)
+      expect(index).toStrictEqual(1)
     }
   )
 
@@ -106,8 +106,8 @@ describe('index', () => {
         direction
       }
       const {period} = Animator.animate(Int(1), 1, animation)
-      const animator = Animator.index(period, animation.cels)
-      expect(animator).toStrictEqual(0)
+      const index = Animator.index(period, animation.cels)
+      expect(index).toStrictEqual(0)
     }
   )
 
@@ -120,7 +120,7 @@ describe('index', () => {
     [
       'forward',
       Number.MAX_SAFE_INTEGER,
-      [1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0]
+      [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
     ],
     [
       'reverse',

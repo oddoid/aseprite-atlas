@@ -20,10 +20,10 @@ aseprite-atlas ┌>°┐
   )
 
   const [canvas] = window.document.getElementsByTagName('canvas')
-  if (!canvas) throw new Error('Missing canvas.')
+  if (!canvas) throw Error('Missing canvas.')
 
   const context = canvas.getContext('2d')
-  if (!context) throw new Error('Missing context')
+  if (!context) throw Error('Missing context.')
 
   // Use nearest neighbor scaling.
   context.imageSmoothingEnabled = false
