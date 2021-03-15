@@ -1,4 +1,4 @@
-import type {Int} from './int.js'
+import {Int} from './int.js'
 
 /** Cartesian coordinates in pixels with a top-left origin. */
 export interface XY {

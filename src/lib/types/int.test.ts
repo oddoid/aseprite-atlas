@@ -1,4 +1,4 @@
-import {Int} from './int'
+import {Int} from './int.js'
 
 describe('Int()', () => {
   test.each([

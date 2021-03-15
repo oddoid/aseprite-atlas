@@ -1,4 +1,4 @@
-import {assert, assertType, requireType} from './assert'
+import {assert, assertType, requireType} from './assert.js'
 
 test('assert(false)', () => expect(() => assert(false, 'msg')).toThrow('msg'))
 

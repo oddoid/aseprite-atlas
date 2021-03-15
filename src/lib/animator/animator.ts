@@ -1,7 +1,7 @@
-import {Aseprite} from '../types/aseprite.js'
-import {Atlas} from '../types/atlas.js'
+import type {Aseprite} from '../types/aseprite.js'
+import type {Atlas} from '../types/atlas.js'
 import {Int} from '../types/int.js'
-import {Millis} from '../types/millis.js'
+import type {Millis} from '../types/millis.js'
 import {requireType} from '../utils/assert.js'
 import {NumberUtil} from '../utils/number-util.js'
 

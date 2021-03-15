@@ -1,5 +1,5 @@
-import {Int} from './int.js'
-import {Millis} from './millis.js'
+import type {Int} from './int.js'
+import type {Millis} from './millis.js'
 
 /**
  * This typing assumes the options specified in aseprite-atlas-pack and

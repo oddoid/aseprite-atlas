@@ -1,4 +1,4 @@
-import {assert as assertTrue, requireType} from '../utils/assert'
+import {assert as assertTrue, requireType} from '../utils/assert.js'
 
 /**
  * An integer `number` in
