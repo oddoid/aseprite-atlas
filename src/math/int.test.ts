@@ -1,4 +1,4 @@
-import {Int} from './int.js'
+import {Int, limits} from './int.js'
 
 describe('tryClamp()', () => {
   test.each([
@@ -17,7 +17,9 @@ describe('tryClamp()', () => {
 
     ['not a number', NaN, undefined]
   ])('%s', (_, value, expected) =>
-    expect(Int.tryClamp(value)).toStrictEqual(expected)
+    expect(Int.tryClamp(value, limits.safe.min, limits.safe.max)).toStrictEqual(
+      expected
+    )
   )
 })
 
