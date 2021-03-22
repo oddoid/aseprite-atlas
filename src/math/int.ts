@@ -3,7 +3,9 @@ import {NumberUtil} from './number-util.js'
 
 export const limits = <const>{
   safe: {min: -0x1f_ffff_ffff_ffff, max: 0x1f_ffff_ffff_ffff},
-  u8: {min: 0, max: 0xff}
+  u16: {min: 0, max: 0xffff},
+  u8: {min: 0, max: 0xff},
+  i8: {min: -0x7f, max: 0x80}
 }
 
 export namespace Limits {
